@@ -1,0 +1,22 @@
+#Technical Setup (Manifest version III) 
+{
+  "manifest_version": 3,
+  "name": "Sports & Prediction Tracker",
+  "version": "1.0",
+  "permissions": ["storage", "alarms"],
+  "host_permissions": [
+    "https://*.kalshi.com/*",
+    "https://*.fanduel.com/*",
+    "https://api.the-odds-api.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.fanduel.com/*", "https://kalshi.com/*"],
+      "js": ["content.js"],
+      "css": ["overlay.css"]
+    }
+  ]
+}
