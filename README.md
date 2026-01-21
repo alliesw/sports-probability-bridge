@@ -49,3 +49,5 @@ Before publishing to the Chrome Web Store, you can test the extension locally:
 
 ## 🔒 Security Note
 This extension uses `chrome.storage.session` to store Kalshi tokens. This ensures your session data is wiped every time the browser is closed. Never commit your `config.js` or API keys to a public repository.
+
+MIT LICENSE 
