@@ -1,0 +1,50 @@
+//To ensure your extension works reliably on a dynamic site like FanDuel, you need a MutationObserver. Modern betting sites don't load all data at once; they inject content as you scroll or as odds shift.
+
+//The code below observes the page for changes and re-runs your matching logic whenever new team names appear on the screen.
+
+
+// 1. The Core Matching Logic
+function performMatch(kalshiData) {
+  const teamElements = document.querySelectorAll('.team-name-class');
+  if (teamElements.length === 0) return;
+
+  teamElements.forEach(el => {
+    const teamName = el.innerText.trim();
+    const score = getSimilarity(resolveTeamName(teamName), kalshiData.title);
+
+    if (score > 0.7) {
+      console.log(`Matched ${teamName}!`);
+      updateOverlay(kalshiData.price);
+    }
+  });
+}
+
+// 2. The MutationObserver
+// This watches the DOM and triggers when FanDuel injects new odds or teams
+const observer = new MutationObserver((mutations) => {
+  // We check if any new nodes were added to avoid constant unnecessary execution
+  const addedNodes = mutations.some(m => m.addedNodes.length > 0);
+  if (addedNodes && window.latestKalshiData) {
+    performMatch(window.latestKalshiData);
+  }
+});
+
+// Start observing the body for child element changes
+observer.observe(document.body, { childList: true, subtree: true });
+
+// 3. Updated Message Listener
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === "KALSHI_UPDATE") {
+    // Store data globally so the observer can access it when the DOM changes
+    window.latestKalshiData = message.payload;
+    performMatch(message.payload);
+  }
+  
+  if (message.type === "STAT_UPDATE") {
+    const liveVal = document.getElementById('live-val');
+    if (liveVal && message.payload?.yes_price) {
+      liveVal.innerText = `Kalshi Yes: ${message.payload.yes_price}¢`;
+    }
+  }
+  return true;
+});
