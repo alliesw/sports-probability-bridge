@@ -90,8 +90,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
   return true;
 });
-3. How to use this for fine-tuning
+//3. How to use this for fine-tuning
 
-Watch the Score: If you see "Lakers" matching at 65%, you'll know you need to either lower your threshold to 0.6 or add "lakers" to your TEAM_ALIASES.
+//Watch the Score: If you see "Lakers" matching at 65%, you'll know you need to either lower your threshold to 0.6 or add "lakers" to your TEAM_ALIASES.
 
-Verify Selectors: If the "Best Match" consistently says "None," it means your .team-name-class selector isn't finding the text on the page.
+//Verify Selectors: If the "Best Match" consistently says "None," it means your .team-name-class selector isn't finding the text on the page.
