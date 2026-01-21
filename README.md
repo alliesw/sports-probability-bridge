@@ -1,12 +1,7 @@
 # Sports-Betting-Chrome-Extension
 
-(1) Tool that integrates directly with major books like Kalshi, FanDuel, and Draftkings. It allows you to analyze player props and execute bets in two clicks while showing you where the best odds are currently live. 
+(1) Tool that integrates directly with major books like Kalshi, FanDuel, and Draftkings. It allows you to analyze player props, while showing you where the best odds are currently live and links your sports books accounts to track your ROI from several sports betting apps - providing insight into how much money and time your spending and means to stop sports betting if it's a problem.  
 
-(2) Accesses real-time data from US, UK, and EU bookmakers. It is often used to sync live odds directly into Google Sheets for bettors who build their own models. 
-
-(3) Odds to Probability Text Changer: A utility tool that scans any webpage and converts American odds (e.g., +140) into implied probability percentages (41.7%), helping you quickly spot if a book is overpricing an outcome. 
-
-(4) Bet Tracking & Bankroll Management: An extension that links to your sports book account and shows you how much your winning and losing (ROI)
 
 Requirements: 
 Extensions will need to handle both WebSockets (for Kalshi's rapid updates) and REST APIs or DOM Scraping (for FanDuel).
