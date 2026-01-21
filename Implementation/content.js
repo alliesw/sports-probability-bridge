@@ -173,3 +173,120 @@ function calculateImpliedProb(odds) {
   if (odds > 0) return (100 / (odds + 100) * 100).toFixed(1);
   return (Math.abs(odds) / (Math.abs(odds) + 100) * 100).toFixed(1);
 }
+---------------------------------------------------------------------- //or 
+  // --- CONFIG & DICTIONARY ---
+const TEAM_ALIASES = {
+  "ny": "new york", "la": "los angeles", "gs": "golden state",
+  "warriors": "golden state warriors", "philly": "philadelphia",
+  "phx": "phoenix", "lv": "las vegas", "usa": "united states"
+};
+
+let currentTicker = null;
+
+// --- UI INJECTION ---
+const trackerUI = document.createElement('div');
+trackerUI.id = 'betting-tracker-overlay';
+trackerUI.style.cssText = `
+  position: fixed; top: 10px; right: 10px; z-index: 9999; 
+  background: rgba(0, 0, 0, 0.9); color: white; padding: 12px; 
+  border-radius: 8px; font-family: monospace; font-size: 12px;
+  border: 1px solid #444; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  display: flex; flex-direction: column; gap: 8px; min-width: 180px;
+`;
+
+trackerUI.innerHTML = `
+  <div style="font-weight: bold; border-bottom: 1px solid #444; padding-bottom: 4px;">KALSHI LIVE</div>
+  <div>Price: <span id="live-val" style="color: #00ff00; font-weight: bold; font-size: 14px;">--</span></div>
+  <div id="debug-info" style="color: #aaa; font-size: 10px; line-height: 1.2;">Scanning...</div>
+  <button id="save-link-btn" style="
+    background: #2196F3; color: white; border: none; padding: 6px; 
+    border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold;">
+    LOCK THIS MARKET
+  </button>
+`;
+document.body.appendChild(trackerUI);
+
+// --- SIMILARITY LOGIC ---
+function resolveTeamName(name) {
+  if (!name) return "";
+  let cleanName = name.toLowerCase().trim();
+  const words = cleanName.split(/\s+/);
+  return words.map(word => TEAM_ALIASES[word] || word).join(' ');
+}
+
+function getSimilarity(s1, s2) {
+  const str1 = resolveTeamName(s1);
+  const str2 = resolveTeamName(s2);
+  const longer = str1.length > str2.length ? str1 : str2;
+  const shorter = str1.length > str2.length ? str2 : str1;
+  if (longer.length === 0) return 1.0;
+
+  const costs = [];
+  for (let i = 0; i <= str1.length; i++) {
+    let lastValue = i;
+    for (let j = 0; j <= str2.length; j++) {
+      if (i === 0) costs[j] = j;
+      else if (j > 0) {
+        let newValue = costs[j - 1];
+        if (str1.charAt(i - 1) !== str2.charAt(j - 1)) {
+          newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+        }
+        costs[j - 1] = lastValue;
+        lastValue = newValue;
+      }
+    }
+    if (i > 0) costs[str2.length] = lastValue;
+  }
+  return (longer.length - costs[str2.length]) / longer.length;
+}
+
+// --- STORAGE & MESSAGING ---
+document.getElementById('save-link-btn').addEventListener('click', async () => {
+  if (!currentTicker) return alert("No match found yet to lock!");
+  const path = window.location.pathname;
+  await chrome.storage.local.set({ [`link_${path}`]: currentTicker });
+  document.getElementById('save-link-btn').innerText = "LOCKED ✅";
+  document.getElementById('save-link-btn').style.background = "#4CAF50";
+});
+
+async function checkManualLink() {
+  const path = window.location.pathname;
+  const result = await chrome.storage.local.get(`link_${path}`);
+  if (result[`link_${path}`]) {
+    currentTicker = result[`link_${path}`];
+    document.getElementById('debug-info').innerText = `Locked: ${currentTicker}`;
+  }
+}
+
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.type === "KALSHI_UPDATE") {
+    const { ticker, title, price } = message.payload;
+    const liveVal = document.getElementById('live-val');
+    const debugInfo = document.getElementById('debug-info');
+
+    if (currentTicker && ticker === currentTicker) {
+      liveVal.innerText = `${price}¢`;
+      liveVal.style.color = "#00f0ff"; // Cyan for locked
+      return;
+    }
+
+    if (!currentTicker) {
+      const teamElements = document.querySelectorAll('.team-name-class'); // Adjust as needed
+      let bestMatch = { score: 0, name: "" };
+
+      Array.from(teamElements).forEach(el => {
+        const score = getSimilarity(el.innerText, title);
+        if (score > bestMatch.score) bestMatch = { score, name: el.innerText };
+      });
+
+      debugInfo.innerHTML = `Best: ${bestMatch.name || '?'}<br>Score: ${(bestMatch.score * 100).toFixed(0)}%`;
+
+      if (bestMatch.score > 0.7) {
+        currentTicker = ticker;
+        liveVal.innerText = `${price}¢`;
+      }
+    }
+  }
+});
+
+checkManualLink();
