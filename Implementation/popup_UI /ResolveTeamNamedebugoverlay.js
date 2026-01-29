@@ -14,7 +14,7 @@ function resolveTeamName(name) {
   return expandedWords.join(' ');
 }
 
-------------------------------------------------------------------
+//------------------------------------------------------------------
 //Consolidated Logic with Debugging
 
 //This version tracks the highest score found during the loop and displays it in the overlay.
