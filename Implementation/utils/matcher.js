@@ -1,20 +1,19 @@
-The most effective approach for a Chrome extension is a Two-Tier Matching System:
+//The most effective approach for a Chrome extension is a Two-Tier Matching System:
 
-Normalization: Clean strings (lowercase, remove "the", "FC", "LA", etc.).
+//Normalization: Clean strings (lowercase, remove "the", "FC", "LA", etc.).
 
-Scoring: Use the Levenshtein Distance or Dice's Coefficient to find the closest match.
+//Scoring: Use the Levenshtein Distance or Dice's Coefficient to find the closest match.
 
-1. The Logic Flow
+//1. The Logic Flow
 
-The extension needs to compare the "Market Name" from Kalshi against the "Game Name" on FanDuel.
+//The extension needs to compare the "Market Name" from Kalshi against the "Game Name" on FanDuel.
 
-2. Implementation: The Matching Helper
+//2. Implementation: The Matching Helper
 
-You can use a lightweight library like fuse.js or fuzzball, but for a Chrome extension where you want to keep the bundle small, a custom Dice's Coefficient function works best:
+//You can use a lightweight library like fuse.js or fuzzball, but for a Chrome extension where you want to keep the bundle small, a custom Dice's Coefficient function works best:
 
 //FUZZING MATCHING FOR DIFFERENT STRINGS > BRIDGING STRING SIMILARTIIES btwn kalshi and fanduel 
-JavaScript
-// utils/matcher.js
+
 
 /**
  * Calculates similarity between two strings (0 to 1)

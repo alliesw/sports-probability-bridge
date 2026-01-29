@@ -1,7 +1,7 @@
 //Updated Message Listener
 
 //Finally, here is how you use it inside your chrome.runtime.onMessage listener to handle the matching:
-/
+
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "KALSHI_UPDATE") {
