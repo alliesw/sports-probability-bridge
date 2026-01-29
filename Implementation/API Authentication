@@ -70,7 +70,5 @@ JSON
 {
   "permissions": ["storage"],
   "host_permissions": ["https://api.kalshi.com/*"]
-
-
   "host_permissions": ["https://api.kalshi.com"]
 }
