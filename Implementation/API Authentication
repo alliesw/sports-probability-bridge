@@ -19,7 +19,7 @@ async function kalshiLogin(apiKey, privateKey) {
   const path = "/trade-api/v2/login";
   
   // 1. Generate the signature (Requires an RSA library like 'jsrsasign')
-  const message = timestamp + method + path;
+  const message = timestamp + method + path; 
   const signature = generateRSASignature(message, privateKey);
 
   // 2. Exchange for a Session Token
@@ -70,4 +70,7 @@ JSON
 {
   "permissions": ["storage"],
   "host_permissions": ["https://api.kalshi.com/*"]
+
+
+  "host_permissions": ["https://api.kalshi.com"]
 }
