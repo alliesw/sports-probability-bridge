@@ -23,6 +23,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   const displayArea = document.getElementById('live-val');
   if (!displayArea) return;
 
+  
+
   // Handle STAT_UPDATE (Direct price updates)
   if (message.type === "STAT_UPDATE") {
     if (message.payload?.yes_price) {
@@ -56,6 +58,26 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   return true; // Keep channel open for async
+});
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === "KALSHI_UPDATE") {
+    const kalshiMarket = message.payload.title;
+    const teamElements = document.querySelectorAll('.team-name-class'); // Adjust selector for FanDuel
+    
+    Array.from(teamElements).forEach(el => {
+      const teamName = el.innerText;
+      const score = getSimilarity(teamName, kalshiMarket);
+
+      // Log for debugging visibility
+      console.log(`Comparing [${teamName}] to [${kalshiMarket}] | Score: ${score.toFixed(2)}`);
+
+      if (score > 0.7) {
+        updateOverlay(message.payload.price);
+      }
+    });
+  }
+  return true;
 });
 
 // --- 3. Helper Functions ---
