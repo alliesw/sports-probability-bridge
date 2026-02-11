@@ -1,0 +1,71 @@
+python and Node.js.
+
+1. Python Implementation
+
+This script uses the requests library to fetch live odds for upcoming games. You will need an API key from The Odds API.
+
+Python
+import requests
+
+# 1. Configuration
+API_KEY = 'YOUR_API_KEY'
+SPORT = 'upcoming' # Use 'soccer_epl', 'americanfootball_nfl', etc.
+REGION = 'us'      # us | uk | eu | au
+MARKET = 'h2h'    # h2h (moneyline) | spreads | totals
+ODDS_FORMAT = 'american' # decimal | american
+
+# 2. Get Odds Data
+odds_response = requests.get(
+    f'https://api.the-odds-api.com/v4/sports/{SPORT}/odds', 
+    params={
+        'api_key': API_KEY,
+        'regions': REGION,
+        'markets': MARKET,
+        'oddsFormat': ODDS_FORMAT,
+    }
+)
+
+if odds_response.status_code != 200:
+    print(f'Error: {odds_response.status_code}, {odds_response.text}')
+else:
+    odds_json = odds_response.json()
+    print(f'Successfully fetched {len(odds_json)} events')
+    
+    # Print the first event's odds
+    if odds_json:
+        print(f"Match: {odds_json[0]['home_team']} vs {odds_json[0]['away_team']}")
+        print(f"Bookmaker: {odds_json[0]['bookmakers'][0]['title']}")
+2. Node.js (JavaScript) Implementation
+
+Using the axios library, this is ideal for web applications or backend services.
+
+JavaScript
+const axios = require('axios');
+
+const apiKey = 'YOUR_API_KEY';
+const sportKey = 'upcoming';
+
+axios.get(`https://api.the-odds-api.com/v4/sports/${sportKey}/odds`, {
+    params: {
+        apiKey: apiKey,
+        regions: 'us',
+        markets: 'h2h,spreads',
+        oddsFormat: 'american',
+    }
+})
+.then(response => {
+    console.log(JSON.stringify(response.data, null, 2));
+    console.log('Remaining Requests:', response.headers['x-requests-remaining']);
+})
+.catch(error => {
+    console.log('Error:', error.response ? error.response.data : error.message);
+});
+Key Features & Parameters
+
+If you are trying to replicate the Sports Odds Plus experience, these parameters are essential:
+
+Parameter	Options	Description
+regions	us, us2, uk, eu, au	Filters bookmakers by geographic region.
+markets	h2h, spreads, totals, outrights	Defines the type of betting lines returned.
+oddsFormat	decimal, american	Sets the visual format of the price.
+eventIds	(Comma separated IDs)	Filters the response to specific matches only.
