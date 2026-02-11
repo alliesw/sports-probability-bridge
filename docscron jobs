@@ -1,0 +1,19 @@
+1. Linux or macOS: Using Cron
+
+Cron is a time-based job scheduler. To set it up, you’ll use the "crontab" (cron table).
+
+Open your terminal.
+
+Type crontab -e to open your cron file.
+
+Add the following line at the very bottom:
+
+Bash
+0 * * * * /usr/bin/python3 /absolute/path/to/your_script.py
+Breaking down the syntax:
+
+0 * * * *: This tells the system to run the script at the 0th minute of every hour.
+
+/usr/bin/python3: This is the absolute path to your Python executable (find yours by typing which python3 in the terminal).
+
+/absolute/path/to/your_script.py: The full path to where you saved the code.
